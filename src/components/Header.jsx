@@ -1,19 +1,17 @@
-import React, { use, useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router';
-import { AuthContext } from '../context/AuthContext';
-import Swal from 'sweetalert2';
 
-const Header = () => {
-    const { user, logOut } = use(AuthContext);
-    const navigate = useNavigate();
-    const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+"use client";
 
-    useEffect(() => {
-        const html = document.querySelector("html");
-        html.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-    }, [theme]);
+import Link from "next/link";
+import Image from "next/image"; 
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
+import { Menu, LogOut, ChevronDown } from "lucide-react"; 
 
+export default function Header() {
+    const router = useRouter();
+    const { user, logOut } = useContext(AuthContext);
 
     const handleLogout = async () => {
         try {
@@ -24,9 +22,8 @@ const Header = () => {
                 timer: 1500,
                 showConfirmButton: false,
             });
-            navigate("/login");
+            router.push("/login");
         } catch (err) {
-            console.error(err);
             Swal.fire({
                 icon: "error",
                 title: "Logout failed",
@@ -34,88 +31,96 @@ const Header = () => {
         }
     };
 
-    const handleTheme = (checked) => {
-        setTheme(checked ? "dark" : "light");
-    };
-
-    const links = (
+    const navLinks = (
         <>
-            <li><NavLink to='/'>Home</NavLink></li>
-            <li><NavLink to='/all-vehicles'>All Vehicles</NavLink></li>
-            <li><NavLink to='/add-vehicles'>Add Vehicle</NavLink></li>
-            <li><NavLink to='/my-vehicles'>My Vehicles</NavLink></li>
-            <li><NavLink to='/my-bookings'>My Bookings</NavLink></li>
+            <li><Link href="/" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition duration-150">Home</Link></li>
+            <li><Link href="/all-vehicles" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition duration-150">All Vehicles</Link></li>
+            <li><Link href="/add-vehicles" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition duration-150">Add Vehicle</Link></li>
+            <li><Link href="/my-vehicles" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition duration-150">My Vehicles</Link></li>
+            <li><Link href="/my-bookings" className="px-3 py-2 text-gray-700 hover:text-blue-600 transition duration-150">My Bookings</Link></li>
         </>
     );
 
     return (
-        <div className="bg-base-200 text-base-content shadow-md">
-            <div className="container-default flex items-center justify-between pr-3 xl:pr-0">
 
-                {/* Left: Logo + Mobile Dropdown */}
-                <div className="flex items-center">
-                    <div className="dropdown">
-                        <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
-                            </svg>
-                        </div>
-                        <ul
-                            tabIndex="-1"
-                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow text-base-content">
-                            {links}
+        <header className="sticky top-0 z-30 bg-white shadow-lg">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+                {/* Left Section: Logo and Mobile Menu */}
+                <div className="flex items-center space-x-4">
+
+                    {/* Logo Image (Fixed size required by Next/Image) */}
+                    <Link href="/">
+                        <Image
+                            src="https://i.postimg.cc/sfHWM3b5/Gemini_Generated_Image_uvqzqluvqzqluvqz_1_1.png"
+                            alt="TravelEase Logo"
+                            width={120} // Adjusted size for better fit
+                            height={30}
+                        />
+                    </Link>
+
+                    {/* Mobile Hamburger Menu (Hidden on large screens) */}
+                    <div className="lg:hidden dropdown relative">
+                        <label tabIndex={0} className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer">
+                            <Menu className="w-6 h-6" />
+                        </label>
+                        <ul tabIndex={0} className="absolute left-0 mt-3 w-52 p-2 shadow-xl bg-white rounded-lg border border-gray-200 z-50">
+                            {navLinks}
                         </ul>
                     </div>
-
-                    <img className="w-50" src="https://i.postimg.cc/sfHWM3b5/Gemini_Generated_Image_uvqzqluvqzqluvqz_1_1.png" alt="Logo" />
                 </div>
 
-                {/* Center: Menu */}
-                <ul className="hidden lg:flex menu menu-horizontal px-1 mx-auto text-base-content">
-                    {links}
-                </ul>
+                {/* Center Section: Desktop Navigation */}
+                <nav className="hidden lg:flex flex-grow justify-center">
+                    <ul className="flex items-center space-x-2">
+                        {navLinks}
+                    </ul>
+                </nav>
 
-                {/* Right: Avatar / Login */}
-                <div className="flex items-center gap-3">
-                    <input
-                        onChange={(e) => handleTheme(e.target.checked)}
-                        type="checkbox"
-                        defaultChecked={localStorage.getItem('theme') === "dark"}
-                        className="toggle toggle-sm"
-                    />
-
+                {/* Right Section: Auth/User Actions */}
+                <div className="flex items-center space-x-3">
                     {user ? (
-
-                        <div className="dropdown dropdown-end dropdown-hover">
-
-                            {/* Avatar) */}
-                            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                                <div className="w-10 rounded-full">
-                                    <img src={user?.photoURL || "https://i.postimg.cc/W3YZkWYg/default-avatar.png"} alt="User" />
-                                </div>
+                        // User Dropdown (Replaced DaisyUI dropdown with pure Tailwind)
+                        <div className="relative group">
+                            <label tabIndex={0} className="flex items-center p-1 rounded-full bg-gray-50 hover:bg-gray-100 cursor-pointer transition">
+                                <Image
+                                    src={user?.photoURL || "https://i.postimg.cc/W3YZkWYg/default-avatar.png"}
+                                    alt="User Avatar"
+                                    width={32}
+                                    height={32}
+                                    className="rounded-full mr-2 object-cover"
+                                />
+                                <span className="text-sm font-medium text-gray-700 hidden md:inline">{user?.displayName?.split(' ')[0] || "User"}</span>
+                                <ChevronDown className="w-4 h-4 ml-1 text-gray-500" />
                             </label>
 
                             {/* Dropdown Content */}
-                            <ul
-                                tabIndex={0}
-                                className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 text-base-content -mt-1">
-                                <li><a className="justify-between">{user?.displayName || "User"}</a></li>
-                                <li><button onClick={handleLogout}>Logout</button></li>
+                            <ul tabIndex={0} className="absolute right-0 mt-3 w-52 p-2 shadow-xl bg-white rounded-lg border border-gray-200 hidden group-hover:block z-50 transition duration-200 origin-top-right">
+                                <li>
+                                    <span className="block px-4 py-2 text-sm text-gray-800 font-semibold border-b border-gray-100">
+                                        {user?.email}
+                                    </span>
+                                </li>
+                                {/* Placeholder routes for Add/Manage product that were in DaisyUI dropdown */}
+                                <li><Link href="/add-vehicles" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md">Add Vehicle</Link></li>
+                                <li><Link href="/my-vehicles" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-md">My Vehicles</Link></li>
+                                <li>
+                                    <button onClick={handleLogout} className="w-full text-left flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-md mt-1 border-t border-gray-100">
+                                        <LogOut className="w-4 h-4 mr-2" />
+                                        Logout
+                                    </button>
+                                </li>
                             </ul>
                         </div>
                     ) : (
+                        // Login/Register Buttons (Standard Tailwind buttons)
                         <>
-                            <NavLink className='btn btn-primary ml-2' to='/login'>Login</NavLink>
-                            <NavLink className='btn btn-primary ml-2' to='/register'>Register</NavLink>
+                            <Link href="/login" className="px-4 py-2 text-blue-600 hover:text-blue-700 transition duration-150">Login</Link>
+                            <Link href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150">Register</Link>
                         </>
                     )}
-
-
                 </div>
-
             </div>
-        </div>
+        </header>
     );
-};
-
-export default Header;
+}

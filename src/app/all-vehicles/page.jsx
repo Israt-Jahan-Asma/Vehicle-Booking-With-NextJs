@@ -1,11 +1,11 @@
-// src/app/all-vehicles/page.js
-"use client"; // MUST be a Client Component to use useState and useEffect
+
+"use client"; 
 
 import { useState, useEffect } from 'react';
 import VehicleCard from '@/components/VehicleCard';
 
-// Base URL for your Express backend
-const API_BASE_URL = 'http://localhost:8000';
+
+const API_BASE_URL = 'https://vehicle-booking-with-express-server.vercel.app';
 
 export default function AllVehiclesPage() {
     const [vehicles, setVehicles] = useState([]);
@@ -23,7 +23,7 @@ export default function AllVehiclesPage() {
 
                 const data = await res.json();
 
-                // Map the MongoDB ObjectId to a string
+                
                 const mappedVehicles = data.map(vehicle => ({
                     ...vehicle,
                     _id: vehicle._id ? vehicle._id.toString() : null,
@@ -40,7 +40,7 @@ export default function AllVehiclesPage() {
         };
 
         fetchVehicles();
-    }, []); // Empty dependency array runs once on mount
+    }, []); 
 
     return (
         <div className="py-10">
@@ -70,7 +70,7 @@ export default function AllVehiclesPage() {
             {!loading && vehicles.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {vehicles.map((vehicle) => (
-                        // VehicleCard has the safety check we added
+                       
                         <VehicleCard key={vehicle._id} vehicle={vehicle} />
                     ))}
                 </div>

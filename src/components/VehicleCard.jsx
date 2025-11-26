@@ -8,7 +8,6 @@ export default function VehicleCard({ vehicle }) {
         return null;
     }
 
- 
     const {
         _id,
         vehicleName,          
@@ -26,7 +25,7 @@ export default function VehicleCard({ vehicle }) {
     const imageSrc = coverImage ;
 
     return (
-        // Use Next.js Link for navigation and apply hover effects directly with Tailwind
+        
         <Link
             href={`/all-vehicles/${cardId}`}
             className="group block bg-white w-full border border-gray-200 rounded-xl transition duration-300 overflow-hidden shadow-lg hover:shadow-2xl hover:border-blue-500"
